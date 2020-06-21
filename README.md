@@ -13,4 +13,5 @@ much interesting output.
 #### ... WHY
 To gain personal experience on C programming.
 
-
+#### Doc used
+https://id3.org/id3v2.3.0
