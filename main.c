@@ -22,10 +22,14 @@ void checkUserInput(char *input)
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     char filename[50];
-    puts("STATE FILENAME TO READ");
-    strcpy(filename, "Kuroneko - Uso No Hibana.mp3");
+    if (argc != 2) {
+        puts("STATE FILENAME TO READ");
+        fgets(filename, sizeof(filename), stdin);
+    } else {
+        strncpy(filename, argv[2], sizeof(filename));
+    }
     filename[strcspn(filename, "\n\r")] = 0;
 
     checkUserInput(filename);
@@ -39,14 +43,25 @@ int main() {
 
     fptr = openFile(completefilepath);
 
-    unsigned char buffer[3];
+    int revision;
+    getId3v2Revision(fptr, &revision);
 
-    // GET ID3 HEADER
-    fread(buffer, 1, 3, fptr);
-    //printf("CONTENT: '%s'\n", buffer);
-    fseek(fptr, 7, SEEK_CUR);
+    if (revision == -1) {
+        fprintf(stderr, "Format is not ID3");
+        exit(9);
+    }
+    printf("ID3VERSION: ID3v2.%d\n\n", revision);
+
+    bool hasextendedheader = extendedHeader(fptr);
+    if (hasextendedheader) {
+        //skipextendedheader();
+    }
+
+    unsigned int sizehdr;
+    getsizehdr(fptr, &sizehdr);
 
     unsigned char framenamebuf[4];
+
     unsigned char *valbuffer;
     int valuebuffersize = 1024;
     valbuffer = malloc(valuebuffersize);
