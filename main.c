@@ -28,15 +28,17 @@ int main(int argc, char* argv[]) {
         puts("STATE FILENAME TO READ");
         fgets(filename, sizeof(filename), stdin);
     } else {
-        strncpy(filename, argv[2], sizeof(filename));
+
+        strncpy(filename, argv[1], sizeof(filename));
     }
+
     filename[strcspn(filename, "\n\r")] = 0;
 
     checkUserInput(filename);
 
     char *completefilepath;
-    completefilepath = malloc(strlen(filename) + strlen(PATH_TO_FILES));
-    sprintf(completefilepath, "%s%s", PATH_TO_FILES, filename);
+    completefilepath = malloc(strlen(filename) + strlen(PATH_TO_FILES) +1);
+    sprintf(completefilepath, "%s%s\0", PATH_TO_FILES, filename);
 
     errno = 0;
     FILE *fptr;
@@ -60,14 +62,23 @@ int main(int argc, char* argv[]) {
     unsigned int sizehdr;
     getsizehdr(fptr, &sizehdr);
 
-    unsigned char framenamebuf[4];
+    int framenamelen;
+    framenamelen = 5;
+    if(revision < 3) {
+        framenamelen = 4;
+    }
+    unsigned char framenamebuf[framenamelen];
+    memset(framenamebuf, 0, sizeof(framenamebuf));
 
     unsigned char *valbuffer;
     int valuebuffersize = 1024;
     valbuffer = malloc(valuebuffersize);
 
-    for(int i=0; i<=8; i++){
-        getFrameData(fptr, framenamebuf, valbuffer, valuebuffersize);
+    for(int i=0; i<=5; i++){
+        memset(valbuffer, 0, valuebuffersize);
+        memset(framenamebuf, 0, framenamelen);
+        getFrameData(fptr, &framenamelen, framenamebuf, valbuffer, valuebuffersize);
+
         printf("FRAMENAME: %s\nFRAMEVALUE: %s \n\n", framenamebuf, valbuffer);
     }
 

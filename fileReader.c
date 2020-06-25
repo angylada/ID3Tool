@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "./hexOps.h"
 #include <errno.h>
+#include <netinet/in.h>
 
 //FOR LATER USE
 unsigned const int TIT2_TITLE = 0x54495432;
@@ -19,18 +20,17 @@ FILE* openFile(char* filepath)
     return fptr;
 }
 
-void getFrameData(FILE* fptr, unsigned char *framenamebuf, unsigned char* tagvalue, int tagvaluesize)
+void getFrameData(FILE* fptr, int *framenamelen, unsigned char *framenamebuf, unsigned char* tagvalue, int tagvaluesize)
 {
     // GET FRAME NAME
-    fread(framenamebuf, 1, 4, fptr);
-
+    fread(framenamebuf, 1, (*framenamelen) - 1, fptr);
     // GET FRAME SIZE
     unsigned int vallen;
     fread(&vallen, 4, 1, fptr);
 
     // INT VALUE NEEDS TO BE REVERSED
     // OTHERWISE 0x0000000e (14) becomes 0x0e000000 (234881024)
-    unsigned int correctvallen = REV(vallen);
+    unsigned int correctvallen = ntohl(vallen);
     // GET FRAME VALUE
     fseek(fptr, 3, SEEK_CUR);
     memset(tagvalue, 0, tagvaluesize);
@@ -64,5 +64,5 @@ void getsizehdr(FILE* fptr, unsigned int* dst)
 {
     unsigned int len;
     fread(&len, 1, 4, fptr);
-    *dst = REV(len);
+    *dst = ntohl(len);
 }
