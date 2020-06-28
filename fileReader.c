@@ -32,10 +32,14 @@ void moveStartingNullToEnd(unsigned char* chararray)
     strcpy(chararray, tmp);
 }
 
-void getFrameData(FILE* fptr, int *framenamelen, unsigned char *framenamebuf, unsigned char* tagvalue, int tagvaluesize)
+bool getFrameData(FILE* fptr, int *framenamelen, unsigned char *framenamebuf, unsigned char* tagvalue, int tagvaluesize)
 {
     // GET FRAME NAME
     fread(framenamebuf, 1, (*framenamelen) - 1, fptr);
+
+    if (strlen(framenamebuf) == 0) {
+        return false;
+    }
     // GET FRAME SIZE
     unsigned int vallen;
     fread(&vallen, 4, 1, fptr);
@@ -50,6 +54,7 @@ void getFrameData(FILE* fptr, int *framenamelen, unsigned char *framenamebuf, un
     if (tagvalue[0] == '\0') {
         moveStartingNullToEnd(tagvalue);
     }
+    return true;
 }
 
 

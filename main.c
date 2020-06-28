@@ -74,12 +74,14 @@ int main(int argc, char* argv[]) {
     int valuebuffersize = 1024;
     valbuffer = malloc(valuebuffersize);
 
-    for(int i=0; i<=5; i++){
+    bool hasdata = true;
+    while (hasdata) {
         memset(valbuffer, 0, valuebuffersize);
         memset(framenamebuf, 0, framenamelen);
-        getFrameData(fptr, &framenamelen, framenamebuf, valbuffer, valuebuffersize);
-
-        printf("FRAMENAME: %s\nFRAMEVALUE: %s \n\n", framenamebuf, valbuffer);
+        hasdata = getFrameData(fptr, &framenamelen, framenamebuf, valbuffer, valuebuffersize);
+        if (hasdata) {
+            printf("FRAMENAME: %s\nFRAMEVALUE: %s \n\n", framenamebuf, valbuffer);
+        }
     }
 
 }
