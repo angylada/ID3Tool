@@ -6,7 +6,7 @@
 
 #endif //C_TEST_FILE_READER_H
 
-
+void moveStartingNullToEnd(unsigned char* chararray);
 FILE* openFile(char* filepath);
 void getFrameData(FILE* fptr, int *framenamelen, unsigned char *framenamebuf, unsigned char* tagvalue, int tagvaluesize);
 void getId3v2Revision(FILE* fptr, int *buf);

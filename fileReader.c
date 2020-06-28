@@ -20,6 +20,18 @@ FILE* openFile(char* filepath)
     return fptr;
 }
 
+void moveStartingNullToEnd(unsigned char* chararray)
+{
+    chararray[0] = '_';
+    unsigned char tmp[strlen(chararray)];
+    memset(tmp, 0, strlen(chararray));
+
+    for(int i = 0; i < strlen(chararray) -1; i++) {
+        tmp[i] = chararray[i+1];
+    }
+    strcpy(chararray, tmp);
+}
+
 void getFrameData(FILE* fptr, int *framenamelen, unsigned char *framenamebuf, unsigned char* tagvalue, int tagvaluesize)
 {
     // GET FRAME NAME
@@ -32,9 +44,12 @@ void getFrameData(FILE* fptr, int *framenamelen, unsigned char *framenamebuf, un
     // OTHERWISE 0x0000000e (14) becomes 0x0e000000 (234881024)
     unsigned int correctvallen = ntohl(vallen);
     // GET FRAME VALUE
-    fseek(fptr, 3, SEEK_CUR);
+    fseek(fptr, 2, SEEK_CUR);
     memset(tagvalue, 0, tagvaluesize);
-    fread(tagvalue, 1, correctvallen-1, fptr);
+    fread(tagvalue, 1, correctvallen, fptr);
+    if (tagvalue[0] == '\0') {
+        moveStartingNullToEnd(tagvalue);
+    }
 }
 
 
